@@ -1,0 +1,10 @@
+{
+	"log-level": 4,
+	"pid-file": "/var/log/zfsguru-webserver.pid",
+	"log-file": "/var/log/zfsguru-webserver.log",
+	"webserver-enable": 1,
+	"webserver-cache": 0,
+	"webserver-port": 80,
+	"webserver-root": "/usr/share/www/",
+	"whitelist": ""
+}

@@ -1,0 +1,41 @@
+/*
+	Copyright (C) 2013 CurlyMo
+
+	This file is part of pilight.
+
+    pilight is free software: you can redistribute it and/or modify it under the
+	terms of the GNU General Public License as published by the Free Software
+	Foundation, either version 3 of the License, or (at your option) any later
+	version.
+
+    pilight is distributed in the hope that it will be useful, but WITHOUT ANY
+	WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+	A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with pilight. If not, see	<http://www.gnu.org/licenses/>
+*/
+
+#ifndef _ZFSGURU_H_
+#define _ZFSGURU_H_
+
+/* Internals */
+
+#define WEBSERVER
+#define WEBSERVER_PORT			81
+#define WEBSERVER_ROOT			"/usr/local/share/www/"
+#define WEBSERVER_ENABLE		1
+#define WEBSERVER_CACHE			1
+#define WEBSERVER_WORKERS		1
+#define WEBSERVER_CHUNK_SIZE 	4096
+
+#define VERSION					"1.0"
+#define PID_FILE				"/var/run/zfsguru.pid"
+#define LOG_FILE				"/var/log/zfsguru.log"
+#define SETTINGS_FILE			"/etc/zfsguru/settings.json"
+#define LOG_MAX_SIZE 			1048576 // 1024*1024
+#define BUFFER_SIZE				1024
+#define MAX_UPLOAD_FILESIZE 	5242880
+#define MAX_CACHE_FILESIZE 		5242880
+
+#endif
