@@ -1094,7 +1094,7 @@ static void prepare_cgi_environment(struct connection *conn,
   }
   addenv(blk, "SERVER_ROOT=%s", opts[DOCUMENT_ROOT]);
   addenv(blk, "DOCUMENT_ROOT=%s", opts[DOCUMENT_ROOT]);
-  addenv(blk, "SERVER_SOFTWARE=%s/%s", "pilight", "3.0");
+  addenv(blk, "SERVER_SOFTWARE=%s/%s", "zfsguru", VERSION);
 
   // Prepare the environment block
   addenv(blk, "%s", "GATEWAY_INTERFACE=CGI/1.1");
