@@ -523,34 +523,6 @@ static int webserver_request_handler(struct mg_connection *conn) {
 					sprintf(request, "%s/%s", webserver_root, conn->uri);
 			}
 		}
-		if(access(request, F_OK) == 0) {
-			stat(request, &st);
-			if(webserver_cache && st.st_size <= MAX_CACHE_FILESIZE && 
-			   fcache_add(request) != 0 && fcache_get_size(request, &size) != 0) {
-				goto filenotfound;
-			}
-		} else {
-			goto filenotfound;
-		}
-
-		memset(buffer, '\0', 4096);
-		p = buffer;
-
-		const char *cl = NULL;
-		if((cl = mg_get_header(conn, "Content-Length"))) {
-			if(atoi(cl) > MAX_UPLOAD_FILESIZE) {
-				sfree((void *)&mimetype);
-				char line[1024] = {'\0'};
-				mimetype = webserver_mimetype("text/plain");
-				sprintf(line, "Webserver Warning: POST Content-Length of %d bytes exceeds the limit of %d bytes in Unknown on line 0", MAX_UPLOAD_FILESIZE, atoi(cl));
-				webserver_create_header(&p, "200 OK", mimetype, (unsigned int)strlen(line));
-				mg_write(conn, buffer, (int)(p-buffer));
-				mg_write(conn, line, (int)strlen(line));
-				sfree((void *)&mimetype);
-				sfree((void *)&request);
-				return MG_REQUEST_PROCESSED;
-			}
-		}
 
 		char *dot = NULL;
 		/* Retrieve the extension of the requested file and create a mimetype accordingly */
@@ -589,6 +561,36 @@ static int webserver_request_handler(struct mg_connection *conn) {
 			}
 		}
 		sfree((void *)&ext);
+		
+		if(access(request, F_OK) == 0) {
+			stat(request, &st);
+			if(webserver_cache && st.st_size <= MAX_CACHE_FILESIZE && 
+			   strcmp(mimetype, "application/x-httpd-php") != 0 &&
+			   fcache_get_size(request, &size) != 0 && fcache_add(request) != 0) {
+				goto filenotfound;
+			}
+		} else {
+			goto filenotfound;
+		}
+		
+		memset(buffer, '\0', 4096);
+		p = buffer;
+
+		const char *cl = NULL;
+		if((cl = mg_get_header(conn, "Content-Length"))) {
+			if(atoi(cl) > MAX_UPLOAD_FILESIZE) {
+				sfree((void *)&mimetype);
+				char line[1024] = {'\0'};
+				mimetype = webserver_mimetype("text/plain");
+				sprintf(line, "Webserver Warning: POST Content-Length of %d bytes exceeds the limit of %d bytes in Unknown on line 0", MAX_UPLOAD_FILESIZE, atoi(cl));
+				webserver_create_header(&p, "200 OK", mimetype, (unsigned int)strlen(line));
+				mg_write(conn, buffer, (int)(p-buffer));
+				mg_write(conn, line, (int)strlen(line));
+				sfree((void *)&mimetype);
+				sfree((void *)&request);
+				return MG_REQUEST_PROCESSED;
+			}
+		}
 		/* If webserver caching is enabled, first load all files in the memory */
 		if(strcmp(mimetype, "application/x-httpd-php") == 0 && webserver_php) {
 			char *raw = NULL;
