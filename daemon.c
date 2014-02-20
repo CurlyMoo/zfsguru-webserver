@@ -310,7 +310,7 @@ int main(int argc, char **argv) {
 		threads_register("webserver daemon", &webserver_start, (void *)NULL);
 	}
 	
-	while(1) {
+	while(main_loop) {
 		sleep(1);
 	}
 

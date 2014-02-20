@@ -54,6 +54,7 @@ unsigned int whitelist_number;
 char *webserver_username = NULL;
 char *webserver_password = NULL;
 char *webserver_root = NULL;
+unsigned short webserver_root_free = 0;
 unsigned char alphabet[64] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 struct mg_server *mgserver[WEBSERVER_WORKERS];
 
@@ -61,10 +62,11 @@ int webserver_gc(void) {
 	int i = 0;
 
 	webserver_loop = 0;
-	if(webserver_root) {
+	if(webserver_root_free) {
 		sfree((void *)&webserver_root);
 	}
 	if(whitelist_cache) sfree((void *)&whitelist_cache);
+	sleep(1);
 	for(i=0;i<WEBSERVER_WORKERS;i++) {	
 		mg_destroy_server(&mgserver[i]);
 	}	
@@ -168,8 +170,6 @@ int webserver_check_whitelist(char *ip) {
 			error = 0;
 		}
 	}
-
-	sfree((void *)&pch);
 
 	return error;
 }
@@ -842,7 +842,7 @@ filenotfound:
 }
 
 void *webserver_serve(void *server) {
-	for(;;) {
+	while(webserver_loop) {
 		mg_poll_server((struct mg_server *)server, 1000);
 	}
 	return NULL;
@@ -875,7 +875,7 @@ void *webserver_start(void *param) {
 		logprintf(LOG_ERR, "php support disabled due to missing base64 executable");
 	}
 
-	/* Check on what port the webserver needs to run */
+	// /* Check on what port the webserver needs to run */
 	settings_find_number("webserver-port", &webserver_port);
 	if(settings_find_string("webserver-root", &webserver_root) != 0) {
 		/* If no webserver port was set, use the default webserver port */
@@ -885,6 +885,7 @@ void *webserver_start(void *param) {
 			exit(EXIT_FAILURE);
 		}
 		strcpy(webserver_root, WEBSERVER_ROOT);
+		webserver_root_free = 1;
 	}
 
 	/* Do we turn on webserver caching. This means that all requested files are
@@ -911,6 +912,7 @@ void *webserver_start(void *param) {
 	}
 	logprintf(LOG_DEBUG, "webserver listening to port %d", webserver_port);
 	/* Main webserver loop */
+
 	while(webserver_loop) {
 		sleep(1);
 	}
